@@ -1,6 +1,7 @@
 package shu.jee.grandgallery.controller;
 
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
  * @author 杨宇辰
  * @since 2021-05-24
  */
+@CrossOrigin
 @Controller
 @RequestMapping("//historyVisit")
 public class HistoryVisitController {

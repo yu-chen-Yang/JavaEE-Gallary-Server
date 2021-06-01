@@ -37,6 +37,8 @@ import java.util.*;
  * @author 杨宇辰
  * @since 2021-05-24
  */
+
+@CrossOrigin
 @RestController
 @RequestMapping("//picture")
 public class PictureController {

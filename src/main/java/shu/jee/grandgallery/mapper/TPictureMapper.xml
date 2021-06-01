@@ -13,6 +13,9 @@
     <result column="favourites_count" jdbcType="INTEGER" property="favouritesCount" />
     <result column="likes_count" jdbcType="INTEGER" property="likesCount" />
     <result column="comment_count" jdbcType="INTEGER" property="commentCount" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+
+
 </resultMap>
     <select id="getInfo" parameterType="java.lang.Integer" resultMap="InfoMap">
         select * from v_picture_info where picture_id = #{pictureId,jdbcType=INTEGER}

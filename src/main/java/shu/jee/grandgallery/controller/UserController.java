@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
  * @author 杨宇辰
  * @since 2021-05-24
  */
+@CrossOrigin
 @RestController
 @RequestMapping("//user")
 public class UserController {
@@ -33,6 +34,7 @@ public class UserController {
 
     @PostMapping("/login")
     Response login(@RequestBody UserLoginReq req) {
+        System.out.println(req);
         if (userService.checkPassword(req.getUserId(),req.getPassword())) {
             return Response.success(null);
         }
