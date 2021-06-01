@@ -2,23 +2,19 @@ package shu.jee.grandgallery.controller;
 
 
 import com.UpYun;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.upyun.UpException;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import shu.jee.grandgallery.entity.data.Picture;
 import shu.jee.grandgallery.entity.data.PictureInfo;
 import shu.jee.grandgallery.entity.data.Tags;
-import shu.jee.grandgallery.entity.data.User;
 import shu.jee.grandgallery.request.CommentReq;
-import shu.jee.grandgallery.request.UploadReq;
 import shu.jee.grandgallery.request.UserPictureReq;
 import shu.jee.grandgallery.response.Response;
 import shu.jee.grandgallery.service.PictureService;
@@ -26,7 +22,6 @@ import shu.jee.grandgallery.service.TagsService;
 import shu.jee.grandgallery.service.UserService;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -71,17 +66,39 @@ public class PictureController {
         return Response.success(null,tagNames);
     }
 
+//    @GetMapping("/getPictures")
+//    Response getPictures(String category,Integer page,String method) {
+//        if (method == null)
+//            return Response.success(null,pictureService.getPictures(category,page,"picture_id","asc"));
+//        else if (method.equals("latest"))
+//            return Response.success(null,pictureService.getPictures(category,page,"publish_time","desc"));
+//        else if (method.equals("hottest"))
+//            return Response.success(null,pictureService.getPictures(category,page,"view_time","desc"));
+//        else
+//            return Response.success(null,pictureService.getPictures(category,page,"picture_id","asc"));
+//
+//    }
     @GetMapping("/getPictures")
-    Response getPictures(String category,Integer page,String method) {
-        if (method == null)
-            return Response.success(null,pictureService.getPictures(category,page,"picture_id","asc"));
-        else if (method.equals("latest"))
-            return Response.success(null,pictureService.getPictures(category,page,"publish_time","desc"));
-        else if (method.equals("hottest"))
-            return Response.success(null,pictureService.getPictures(category,page,"view_time","desc"));
-        else
-            return Response.success(null,pictureService.getPictures(category,page,"picture_id","asc"));
-
+    @ApiOperation(value = "获取图片信息",notes = "" +
+            "返回一个列表，除页数外均为选填项，默认排序方式为最多访问;" +
+            "排序依据可以是view_time（访问次数）或者publish_time（上传时间），当然也可以是picture_id;" +
+            "排序顺序可以是ASC（升序）或者DESC（降序）;" +
+            "如果填写了上传者或分类名，则值返回满足条件的图片信息;")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "uploaderId", value = "上传者"),
+            @ApiImplicitParam(name = "categoryName", value = "分类名"),
+            @ApiImplicitParam(name = "orderBy", value = "排序依据"),
+            @ApiImplicitParam(name = "order", value = "排序顺序"),
+            @ApiImplicitParam(name = "page", value = "页数", required = true)
+    })
+    Response getPictures(Integer uploaderId,String categoryName,String orderBy,String order,Integer page) {
+        if (page == null) return Response.error("page is required");
+        List<Picture> pictures = pictureService.getPictures(uploaderId,categoryName,orderBy,order,page);
+        List<PictureInfo> pictureInfos = new ArrayList<>();
+        for (Picture picture:pictures) {
+            pictureInfos.add(pictureService.getInformation(picture.getPictureId()));
+        }
+        return Response.success(null,pictureInfos);
     }
 
     @PostMapping("/comment")
@@ -139,7 +156,7 @@ public class PictureController {
         pictureInfo.setUploaderId(userid);
         UpYun upYun=new UpYun("grandgallery-image","zjh","Sb1GzBevRLbpcG2WsfOp5JFmmQrQOTLn");
         String filename=file.getOriginalFilename()+ UUID.randomUUID().toString()+".jpg";
-        pictureInfo.setPictureUrl("http://job-imags.test.upcdn.net/"+filename);
+        pictureInfo.setPictureUrl("http://grandgallery-image.test.upcdn.net/"+filename);
         System.out.println("图片名称："+filename);
         boolean re = upYun.writeFile(filename,file.getBytes(),false);
         pictureService.addPicture(pictureInfo);

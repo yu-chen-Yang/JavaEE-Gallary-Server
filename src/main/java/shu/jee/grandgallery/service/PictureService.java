@@ -1,8 +1,11 @@
 package shu.jee.grandgallery.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import io.swagger.models.auth.In;
 import shu.jee.grandgallery.entity.data.Comment;
 import shu.jee.grandgallery.entity.data.Picture;
-import com.baomidou.mybatisplus.extension.service.IService;
 import shu.jee.grandgallery.entity.data.PictureInfo;
 
 import java.util.List;
@@ -19,7 +22,7 @@ public interface PictureService extends IService<Picture> {
 
     PictureInfo getInformation(Integer pictureId);
 
-    List<PictureInfo> getPictures(String category,Integer page, String orderBy, String order);
+    List<Picture> getPictures(Integer uploaderId, String categoryName, String orderBy, String order, Integer page);
 
     boolean doComment(Integer userId,Integer pictureId,String content);
 

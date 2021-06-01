@@ -1,6 +1,8 @@
 package shu.jee.grandgallery.controller;
 
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +48,7 @@ public class UserController {
         return Response.success(null,userService.calcRecommendCategories(userId));
     }
 
-    @RequestMapping("/register")
+    @PostMapping("/register")
     Response registerUser(@RequestBody User user) {
         if (userService.register(user)) {
             return Response.success(null, userService.getByUsername(user.getUserName()));
@@ -55,7 +57,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping("/addHistory")
+    @GetMapping("/addHistory")
     Response addHistory(Integer userId,Integer pictureId) {
         userService.addHistory(userId,pictureId);
         return Response.success(null);
@@ -76,10 +78,32 @@ public class UserController {
         return Response.success(null,userService.isFavouritePicture(userId,pictureId));
     }
 
+
     @GetMapping("/getRecent")
     Response getRecent(Integer userId) {
         return Response.success(null,userService.getRecentVisit(userId));
     }
 
+
+    @GetMapping("/getFriends")
+    @ApiOperation("获取userId的所有关注用户")
+    Response getFriends(Integer userId) {
+        return Response.success(null,userService.getFriends(userId));
+    }
+
+
+    @GetMapping("/addFriend")
+    @ApiOperation("userId1关注userId2")
+    Response addFriend(Integer userId1,Integer userId2) {
+        userService.addFriend(userId1, userId2);
+        return Response.success(null);
+    }
+
+    @GetMapping("/deleteFriend")
+    @ApiOperation("userId1取消关注userId2")
+    Response deleteFriend(Integer userId1,Integer userId2) {
+        userService.deleteFriend(userId1, userId2);
+        return Response.success(null);
+    }
 }
 
